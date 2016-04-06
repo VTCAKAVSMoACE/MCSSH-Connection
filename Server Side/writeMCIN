@@ -1,0 +1,11 @@
+#!/bin/bash
+
+while true; do
+read f
+echo "$f" >> "$1/MCIN"
+if [ "$f" == "stop" ]; then
+  exit
+elif [ "$f" == "/stop" ]; then
+  exit
+fi
+done

@@ -1,0 +1,41 @@
+#!/bin/bash
+
+if [ "" == "$1" ]; then
+  echo "No jar file specified."
+  exit 1
+fi
+
+curdir=$(pwd)
+
+function sshinput {
+  while true; do
+    read -r in < "$curdir/MCIN"
+    if [ "$in" == "/stop" ]; then
+      echo "/stop"
+      exit
+    fi
+    echo "$in" 
+  done
+}
+
+function sshoutput {
+  exec "$@" &> "$curdir/MCOUT"
+}
+
+if [ -e "$curdir/MCIN" ]; then
+  echo "MCIN found, removing..."
+  rm -f "$curdir/MCIN"
+fi
+
+mkfifo "$curdir/MCIN"
+echo "MCIN created."
+
+if [ -e "$curdir/MCOUT" ]; then
+  echo "MCOUT found, retaining..."
+else
+  mkfifo "$curdir/MCOUT"
+  echo "MCOUT created."
+fi
+
+sshinput | sshoutput java -XmxM -Xms3072M -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+CMSIncrementalPacing -XX:ParallelGCThreads=2 -XX:+AggressiveOpts -server -jar $1 nogui &
+disown
