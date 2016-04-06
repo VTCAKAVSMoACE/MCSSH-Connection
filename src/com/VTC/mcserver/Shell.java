@@ -4,15 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
 
-/**
- * This program enables you to connect to sshd server and get the shell prompt.
- *   $ CLASSPATH=.:../build javac Shell.java 
- *   $ CLASSPATH=.:../build java Shell
- * You will be asked username, hostname and passwd. 
- * If everything works fine, you will get the shell prompt. Output may
- * be ugly because of lacks of terminal-emulation, but you can issue commands.
- *
- */
 import com.jcraft.jsch.*;
 
 public class Shell {
@@ -41,14 +32,6 @@ public class Shell {
 					return true;
 				return false;
 			}
-
-			// If password is not given before the invocation of
-			// Session#connect(),
-			// implement also following methods,
-			// * UserInfo#getPassword(),
-			// * UserInfo#promptPassword(String message) and
-			// * UIKeyboardInteractive#promptKeyboardInteractive()
-
 		};
 
 		sc.close();
@@ -57,7 +40,7 @@ public class Shell {
 
 		session.setConfig("StrictHostKeyChecking", "no");
 		
-		session.connect(30000); // making a connection with timeout.
+		session.connect(30000);
 
 		return session.openChannel("shell");
 	}
