@@ -37,5 +37,5 @@ else
   echo "MCOUT created."
 fi
 
-sshinput | sshoutput java -XmxM -Xms3072M -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+CMSIncrementalPacing -XX:ParallelGCThreads=2 -XX:+AggressiveOpts -server -jar $1 nogui &
+sshinput | sshoutput java -Xmx3072M -Xms3072M -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:+CMSIncrementalPacing -XX:ParallelGCThreads=2 -XX:+AggressiveOpts -server -jar $1 nogui &
 disown
