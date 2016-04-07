@@ -12,7 +12,7 @@ Before you connect this client to your Minecraft server, you need to do a few th
 ### Client Side
 When you start up MCSSH, you will be greeted by the following screen:
 
-[![enter image description here][1]][1]
+[![Startup Panel][1]][1]
 
 You need to enter in the following information:
 

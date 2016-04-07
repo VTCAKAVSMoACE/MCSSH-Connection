@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
 
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
@@ -34,6 +35,12 @@ import com.jcraft.jsch.JSchException;
 public class ServerConnection extends JFrame {
 
 	private static final long serialVersionUID = 5274524154284957338L;
+
+	private int comindex = 0;
+
+	private ArrayList<String> commandHistory = new ArrayList<String>(0);
+
+	private String currentCommand = "";
 
 	private final PipedInputStream input;
 
@@ -134,7 +141,7 @@ public class ServerConnection extends JFrame {
 				channels[0].connect(3000);
 				inputPrinter.println("cd " + destination.substring(0, destination.lastIndexOf("/")));
 				if (startServer)
-					inputPrinter.println("./servstart "+destination.substring(destination.lastIndexOf("/")+1));
+					inputPrinter.println("./servstart " + destination.substring(destination.lastIndexOf("/") + 1));
 				else
 					inputPrinter.println("cat logs/latest.log");
 				inputPrinter.println("./readMCOUT .");
@@ -200,18 +207,29 @@ public class ServerConnection extends JFrame {
 		});
 
 		commandField.setText("Enter command here");
+		commandField.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				commandFieldActionPerformed(evt);
+			}
+		});
 		commandField.addKeyListener(new KeyListener() {
-			public void keyTyped(KeyEvent evt) {
-				commandFieldKeyTyped(evt);
+
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// UNUSED
 			}
 
 			@Override
 			public void keyPressed(KeyEvent e) {
+				commandFieldKeyPressed(e);
 			}
 
 			@Override
 			public void keyReleased(KeyEvent e) {
+				// UNUSED
 			}
+
 		});
 
 		runCommandButton.setText("Execute");
@@ -277,17 +295,41 @@ public class ServerConnection extends JFrame {
 		return true;
 	}
 
-	private void commandFieldKeyTyped(KeyEvent evt) {
-		if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-			runCommandButtonActionPerformed(null);
+	protected void commandFieldKeyPressed(KeyEvent e) {
+		switch (e.getKeyCode()) {
+		case KeyEvent.VK_UP:
+			if (comindex > 0) {
+				comindex--;
+			}
+			if (comindex == commandHistory.size())
+				currentCommand = commandField.getText();
+			commandField.setText(commandHistory.get(comindex));
+			break;
+		case KeyEvent.VK_DOWN:
+			try {
+				comindex++;
+				commandField.setText(commandHistory.get(comindex));
+			} catch (IndexOutOfBoundsException aoobe) {
+				comindex = commandHistory.size();
+				commandField.setText(currentCommand);
+			}
+			break;
 		}
 	}
 
-	private void runCommandButtonActionPerformed(ActionEvent evt) {
+	private void commandFieldActionPerformed(ActionEvent evt) {
+		commandHistory.add(commandField.getText());
+		currentCommand = "";
+		comindex = commandHistory.size();
 		String command = commandField.getText();
 		inputPrinter.println(command);
+		commandField.setText("");
 		commandLog.append(command + "\n");
 		commandLog.setCaretPosition(commandLog.getDocument().getLength());
+	}
+
+	private void runCommandButtonActionPerformed(ActionEvent evt) {
+		commandFieldActionPerformed(evt);
 	}
 
 	private void closeConnectionActionPerformed(ActionEvent evt) {
